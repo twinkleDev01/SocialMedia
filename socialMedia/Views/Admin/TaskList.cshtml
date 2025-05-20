@@ -1,0 +1,66 @@
+﻿@model List<socialMedia.Core.DTO.TaskListToShowDTO>;
+@{
+    ViewData["Title"] = "TaskList";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+
+<div style="padding:50px" class="container">
+    <div class="d-flex justify-content-between">
+        <h2 class="mt-5">ALL TASK</h2>
+        <button class="btn btn-primary btn-sm"><a class="text-light" asp-controller="Admin" asp-action="AssignTask">ADD TASK</a></button>
+    </div>
+
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+    @{
+        int serial = 1;
+    }
+
+    <table id="employeeTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Project Name</th>
+                <th>Title</th>
+
+                <th>Description</th>
+                <th>Content Type</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>CompletionLink</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@serial</td>
+                    <td>@user.ProjectName</td>
+                    <td>@user.Title</td>
+
+                    <td>@user.Description</td>
+                    <td>@user.ContentType</td>
+                    <td>@user.EmployeeName</td>
+                     <td>@user.Status</td>
+                    <td>@user.CompletionLink</td>
+                </tr>
+                serial++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#employeeTable').DataTable();
+    });
+</script>
+
+

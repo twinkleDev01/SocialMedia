@@ -1,0 +1,176 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<style>
+    .professional-font {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fw-semibold {
+        font-weight: 600;
+    }
+
+    .fs-3x {
+        font-size: 2rem;
+    }
+
+    .fs-6 {
+        font-size: 1rem;
+    }
+
+    .text-white {
+        color: #ffffff;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .lh-1 {
+        line-height: 1.2;
+    }
+
+    .ls-n2 {
+        letter-spacing: -0.5px;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        margin-bottom: 20px;
+    }
+
+        .custom-table th {
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+
+        .custom-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+
+    .table-container {
+        margin-bottom: 30px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+</style>
+
+<link rel="stylesheet" href="~/css/navigationBar.css" />
+<div id="loaderOverlay" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+    <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800 mx-auto mb-4"></div>
+        <p class="text-gray-700 text-lg font-semibold">Loading...</p>
+    </div>
+</div>
+<!-- Dashboard View -->
+<!-- Dashboard View -->
+<div class="d-flex flex-column flex-column-fluid" id="dashboardInfo">
+    <div class="row gy-5 g-xl-10 px-3">
+
+        <!-- Journey Log -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-lg-100 cursor-pointer" style="background-color: #2C3E50; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" id="journeyLogCard">
+                <div class="card-body d-flex flex-column align-items-start text-white">
+                    <i class="fas fa-route fa-2x"></i>
+                    <div class="my-4">
+                        <div class="fs-5 fw-semibold">TOTAL PROJECTS</div>
+                        <div class="fs-6">Total: <span class="fw-bold">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Reminder -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-lg-100 cursor-pointer" style="background-color: #6C5B7B; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" id="dailyReminderCard">
+                <div class="card-body d-flex flex-column align-items-start text-white">
+                    <i class="fas fa-calendar-day fa-2x"></i>
+                    <div class="my-4">
+                        <div class="fs-5 fw-semibold">TOTAL EMPLOYEE</div>
+                        <div class="fs-6">Pending: <span class="fw-bold">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Reminder -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-lg-100 cursor-pointer" style="background-color: #355C7D; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" id="inspectionFormCard">
+                <div class="card-body d-flex flex-column align-items-start text-white">
+                    <i class="fas fa-calendar-week fa-2x"></i>
+                    <div class="my-4">
+                        <div class="fs-5 fw-semibold">PENDING APPROVAL REQUEST</div>
+                        <div class="fs-6">Pending request: <span class="fw-bold inspectionCount"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Reminder -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-lg-100 cursor-pointer" style="background-color: #34495E; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" id="monthlyReminderCard">
+                <div class="card-body d-flex flex-column align-items-start text-white">
+                    <i class="fas fa-calendar-alt fa-2x"></i>
+                    <div class="my-4">
+                        <div class="fs-5 fw-semibold">DEADLINE REMINDER</div>
+                        <div class="fs-6">Pending: <span class="fw-bold">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee List -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-lg-100 cursor-pointer" style="background-color: #457B9D; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" id="employeeCard">
+                <div class="card-body d-flex flex-column align-items-start text-white">
+                    <i class="fas fa-users fa-2x"></i>
+                    <div class="my-4">
+                        <div class="fs-5 fw-semibold">CLIENTS</div>
+                        <div class="fs-6">Total: <span class="fw-bold">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="~/assets/js/navigatiobar.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+        $(document).ready(function () {
+        $('#loaderOverlay').fadeOut();
+    });
+</script>

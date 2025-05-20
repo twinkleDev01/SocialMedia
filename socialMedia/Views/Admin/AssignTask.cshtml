@@ -1,0 +1,80 @@
+﻿@model socialMedia.Core.Domain.ProjectTask
+
+@{
+    ViewData["Title"] = "AssignTask";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center">
+            <h2 class="mb-0 text-light">Assign New Task</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="AssignTask" method="post" class="needs-validation" novalidate>
+
+                <div class="mb-3">
+                    <label asp-for="ProjectId" class="form-label">Project</label>
+                    <select asp-for="ProjectId" class="form-select" required>
+                        <option value="">-- Select Project --</option>
+                        @foreach (var p in ViewBag.Projects)
+                        {
+                            <option value="@p.Id">@p.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="ContentType" class="form-label">Content Type</label>
+                    <select asp-for="ContentType" class="form-select" required>
+                        @foreach (socialMedia.Shared.Enum.Enum.ContentType type in Enum.GetValues(typeof(socialMedia.Shared.Enum.Enum.ContentType)))
+                        {
+                            <option value="@((int)type)">@type</option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="ProjectId" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Task Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter task title" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the task"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Deadline" class="form-label">Deadline</label>
+                    <input asp-for="Deadline" type="date" class="form-control" required />
+                    <span asp-validation-for="Deadline" class="text-danger"></span>
+                </div>
+
+               
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeId" class="form-label">Assign To (Employee)</label>
+                    <select asp-for="EmployeeId" class="form-select" required>
+                        <option value="">-- Select Employee --</option>
+                        @foreach (var e in ViewBag.Employees)
+                        {
+                            <option value="@e.Id">@e.UserName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Assign Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

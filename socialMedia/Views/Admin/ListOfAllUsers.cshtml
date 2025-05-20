@@ -1,0 +1,144 @@
+﻿@model List<socialMedia.Core.DTO.AllUserDetailDTO>
+
+@{
+    
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+
+<div style="padding:50px" class="container">
+<h2 class="mt-5">ALL USERS</h2>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+    @{
+        int serial = 1;
+    }
+
+<table id="employeeTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+           
+            <th>Email</th>
+            <th>Role</th>
+                <th>Update Role</th>
+            <th>Is Active</th>
+        </tr>
+    </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@serial</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                   
+                    <td>@user.Email</td>
+                    <td>@string.Join(", ", user.Roles)</td>
+                    <td>
+                        <select class="role-select" data-userid="@user.Id">
+                            <option value="">--Select Role--</option>
+                            @* Roles will be populated by JavaScript *@
+                        </select>
+                    </td>
+                    <td>
+                        <input type="checkbox" class="status-toggle" data-userid="@user.Id" @(user.IsActive ? "checked" : "") />
+                    </td>
+
+                </tr>
+                serial++;
+            }
+        </tbody>
+</table>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#employeeTable').DataTable();
+    });
+        $(document).ready(function () {
+        // Fetch all roles first
+        $.ajax({
+            url: '/allRoles',
+            method: 'GET',
+            success: function (roles) {
+                $('.role-select').each(function () {
+                    var select = $(this);
+                    $.each(roles, function (i, role) {
+                        select.append($('<option>', { value: role.id, text: role.name }));
+                    });
+                });
+            },
+            error: function () {
+                alert('Failed to load roles.');
+            }
+        });
+
+        // When user changes role in dropdown
+        $(document).on('change', '.role-select', function () {
+            var select = $(this);
+            var userId = select.data('userid');
+            var roleId = select.val();
+
+            if (!roleId) return; // ignore empty selection
+
+            $.ajax({
+                url: '/AssingRole',
+                method: 'GET',  // your API uses GET
+                data: { userId: userId, roleId: roleId },
+                success: function (response) {
+                    alert('Role updated successfully');
+                     location.reload();
+                },
+                error: function (xhr) {
+                    alert('Failed to update role: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+
+        $(document).ready(function () {
+        $('#employeeTable').DataTable();
+
+        // Handle status toggle change
+        $('.status-toggle').change(function () {
+            var checkbox = $(this);
+            var userId = checkbox.data('userid');
+            var status = checkbox.is(':checked');
+
+            $.ajax({
+                url: '/UpdateUserStatus',  
+                type: 'POST',
+                data: { userId: userId, status: status },
+                success: function (response) {
+                    if (response.success) {
+                        alert('User status updated successfully!');
+                    } else {
+                        alert('Error: ' + response.message);
+                        // revert checkbox state on error
+                        checkbox.prop('checked', !status);
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while updating status.');
+                    // revert checkbox state on error
+                    checkbox.prop('checked', !status);
+                }
+            });
+        });
+    });
+
+</script>
+
+
+
+
+

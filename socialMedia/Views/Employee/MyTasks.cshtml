@@ -1,0 +1,36 @@
+﻿@model List<socialMedia.Core.Domain.ProjectTask>;
+@{
+    ViewData["Title"] = "MyTasks";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Deadline</th>
+        <th>Status</th>
+        <th>Update</th>
+    </tr>
+    @foreach (var task in Model)
+    {
+        <tr>
+            <td>@task.Title</td>
+            <td>@task.Deadline.ToShortDateString()</td>
+            <td>@task.Status</td>
+            <td>
+                <form asp-action="UpdateStatus" method="post">
+                    <input type="hidden" name="id" value="@task.Id" />
+                    <select name="status">
+                        <option value="InProgress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <input name="link" placeholder="Completion Link" />
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+
+

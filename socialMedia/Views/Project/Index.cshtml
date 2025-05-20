@@ -1,0 +1,57 @@
+﻿@model List<socialMedia.Core.Domain.Project>
+@{
+    ViewData["Title"] = "Projects List";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div style="padding:50px" class="container">
+    <div class="d-flex justify-content-between">
+            <h2 class="mt-5">ALL PROJECTS</h2>
+            <button class="btn btn-primary btn-sm"><a class="text-light"  asp-controller="Project" asp-action="Create">ADD PROJECT</a></button>
+    </div>
+
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+    @{
+        int serial = 1;
+    }
+
+    <table id="employeeTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Project Name</th>
+                <th>Description</th>
+
+                <th>Created At</th>
+                <th>Is Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@serial</td>
+                    <td>@user.Name</td>
+                    <td>@user.Description</td>
+
+                    <td>@user.CreatedAt</td>
+                    <td>@user.IsActive</td>
+                </tr>
+                serial++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#employeeTable').DataTable();
+    });
+</script>
