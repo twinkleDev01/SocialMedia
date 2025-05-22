@@ -32,25 +32,28 @@
         <tbody>
             @foreach (var user in Model)
             {
-                <tr>
-                    <td>@serial</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                   
-                    <td>@user.Email</td>
-                    <td>@string.Join(", ", user.Roles)</td>
-                    <td>
-                        <select class="role-select" data-userid="@user.Id">
-                            <option value="">--Select Role--</option>
-                            @* Roles will be populated by JavaScript *@
-                        </select>
-                    </td>
-                    <td>
-                        <input type="checkbox" class="status-toggle" data-userid="@user.Id" @(user.IsActive ? "checked" : "") />
-                    </td>
+                if(!user.Roles.Contains("superadmin"))
+                {
+                    <tr>
+                        <td>@serial</td>
+                        <td>@user.FirstName</td>
+                        <td>@user.LastName</td>
 
-                </tr>
-                serial++;
+                        <td>@user.Email</td>
+                        <td>@string.Join(", ", user.Roles)</td>
+                        <td>
+                            <select class="role-select" data-userid="@user.Id">
+                                <option value="">--Select Role--</option>
+                                @* Roles will be populated by JavaScript *@
+                            </select>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="status-toggle" data-userid="@user.Id" @(user.IsActive ? "checked" : "") />
+                        </td>
+
+                    </tr>
+                    serial++;
+                }
             }
         </tbody>
 </table>
@@ -73,6 +76,7 @@
                 $('.role-select').each(function () {
                     var select = $(this);
                     $.each(roles, function (i, role) {
+                        if(role.name !== "superadmin")
                         select.append($('<option>', { value: role.id, text: role.name }));
                     });
                 });

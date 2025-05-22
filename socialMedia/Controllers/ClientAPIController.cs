@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using socialMedia.Core.Domain;
 using socialMedia.Infrastructure;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using static socialMedia.Shared.Enum.Enum;
 namespace socialMedia.Controllers
 {
     [Route("api/[controller]")]
@@ -63,24 +65,39 @@ namespace socialMedia.Controllers
         [HttpGet("filter")]
         public IActionResult GetFilteredTasks(string? contentType, string? status)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var tasks = (from t in _context.ProjectTasks
                          join p in _context.Projects on t.ProjectId equals p.Id
+                         join u in _context.Users on p.ClientId equals u.Id
+                         join ar in _context.UserRoles on u.Id equals ar.UserId
+                         join r in _context.Roles on ar.RoleId equals r.Id
                          where !t.IsDeleted
-                            && (string.IsNullOrEmpty(contentType) || t.ContentType == contentType)
-                            && (string.IsNullOrEmpty(status) || t.Status == status)
+                             //&& (string.IsNullOrEmpty(contentType) || t.ContentType == contentType)
+                             && (string.IsNullOrEmpty(status) || t.Status == status)
+                             && r.Name == "client"
+                             && u.Id == userId
                          select new
                          {
                              t.Id,
                              t.Title,
                              t.Description,
-                             t.ContentType,
+                             ContentType = Convert.ToInt16(t.ContentType) == (int)ContentType.Post ? "Post" :
+                                           Convert.ToInt16(t.ContentType) == (int)ContentType.Video ? "Video" :
+                                           Convert.ToInt16(t.ContentType) == (int)ContentType.Story ? "Story" :
+                                           Convert.ToInt16(t.ContentType) == (int)ContentType.Reel ? "Reel" :
+                                           Convert.ToInt16(t.ContentType) == (int)ContentType.Others ? "Other" :
+                                           "NOT SPECIFIED",
                              t.Status,
                              t.CompletionLink,
                              ProjectName = p.Name,
+                             ClientName = u.UserName,
+                             RoleName = r.Name,
                              Deadline = t.Deadline.ToString("yyyy-MM-dd")
                          }).ToList();
 
             return Ok(tasks);
+
         }
 
         [HttpGet("upcoming")]

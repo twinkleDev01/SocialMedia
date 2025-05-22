@@ -6,7 +6,7 @@ using socialMedia.Core.Domain;
 using socialMedia.Core.DTO;
 using socialMedia.Infrastructure;
 using System.Security.Claims;
-
+using static socialMedia.Shared.Enum.Enum;
 namespace socialMedia.Controllers
 {
    
@@ -35,20 +35,20 @@ namespace socialMedia.Controllers
         }
         public async Task<IActionResult> ListOfAllUsers()
         {
+
             var users = await _context.Users
-         .Select(user => new AllUserDetailDTO
-         {
-             Id = user.Id,
-             FirstName = user.FirstName,
-             LastName = user.LastName,
-             Email = user.Email,
-             IsActive = user.IsActive,
-             Roles = (from userRole in _context.UserRoles
-                      join role in _context.Roles on userRole.RoleId equals role.Id
-                      where userRole.UserId == user.Id
-                      select role.Name).ToList()
-         })
-         .ToListAsync();
+                         .Select(user => new AllUserDetailDTO
+                         {
+                             Id = user.Id,
+                             FirstName = user.FirstName,
+                             LastName = user.LastName,
+                             Email = user.Email,
+                             IsActive = user.IsActive,
+                             Roles = (from userRole in _context.UserRoles
+                                      join role in _context.Roles on userRole.RoleId equals role.Id
+                                      where userRole.UserId == user.Id
+                                      select role.Name).ToList()
+                         }).ToListAsync();
 
             return View(users);
         }
@@ -91,7 +91,7 @@ namespace socialMedia.Controllers
                              Deadline = task.Deadline,
                              Status = task.Status,
                              CompletionLink = task.CompletionLink,
-                             ContentType = task.ContentType,
+                             ContentType = Convert.ToInt32(task.ContentType) == (int)ContentType.Post ? "Post" : Convert.ToInt32(task.ContentType) == (int)ContentType.Video ? "Video" : Convert.ToInt32(task.ContentType) == (int)ContentType.Story ? "Story" : Convert.ToInt32(task.ContentType) == (int)ContentType.Reel ? "Reel" : Convert.ToInt32(task.ContentType) == (int)ContentType.Others ? "Other" : "NOT SPECIFIED",
                              ProjectName = project.Name,
                             CompletionDate = task.CompletionDate,
                              EmployeeName = $"{employee.FirstName} {employee.LastName}"
