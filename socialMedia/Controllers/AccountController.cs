@@ -40,70 +40,112 @@ namespace social.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> Login(LogInDTO login)
+
         {
+
             if (ModelState.IsValid)
+
             {
+
                 var user = await UserManager.FindByEmailAsync(login.Email);
+
                 if (user != null)
+
                 {
+
                     if (user.IsActive != false)
+
                     {
-                        var isValidCredential = await SignInManager.PasswordSignInAsync(user, login.Password, isPersistent: false, lockoutOnFailure: false);
-                        if (isValidCredential.Succeeded)
+
+                        var isCredentail = await UserManager.CheckPasswordAsync(user, login.Password);
+
+                        if (isCredentail)
+
                         {
 
                             var roles = await UserManager.GetRolesAsync(user);
 
                             var claims = new List<Claim>
-                            {
-                                new Claim(ClaimTypes.GivenName,$"{user.FirstName} {user.LastName}" ),
-                                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                                new Claim(ClaimTypes.Email, user.Email)
-                            };
+
+                    {
+
+                        new Claim("UserName",$"{user.FirstName} {user.LastName}" ),
+
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+
+                        new Claim(ClaimTypes.Email, user.Email)
+
+                    };
 
                             // Add role claims
+
                             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
                             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                            var authProperties = new AuthenticationProperties
-                            {
-                                IsPersistent = login.RememberMe
-                            };
-
                             var principal = new ClaimsPrincipal(claimsIdentity);
 
-                            await HttpContext.SignInAsync(
-                                                     CookieAuthenticationDefaults.AuthenticationScheme,
-                                                     principal,
-                                                     new AuthenticationProperties
-                                                     {
-                                                         IsPersistent = true, 
-                                                         ExpiresUtc = DateTime.UtcNow.AddHours(1) 
-                                                     });
+                            await SignInManager.SignOutAsync();
 
-                            return RedirectToAction("Index", "Admin");
+                            await SignInManager.SignInWithClaimsAsync(user, isPersistent: login.RememberMe, claims);
+
+                            if (roles.Contains("superadmin"))
+                            {
+                                return RedirectToAction("Index", "Admin");
+                            }
+                            else if (roles.Contains("Employee"))
+                            {
+                                return RedirectToAction("Dashboard", "Employee");
+                            }
+                            else if (roles.Contains("Client"))
+                            {
+                                return RedirectToAction("Index", "Client");
+                            }
+                            else
+                            {
+                                // Default or unauthorized role fallback
+                                return RedirectToAction("AccessDenied", "Account");
+                            }
                         }
+
                         else
+
                         {
+
                             ModelState.AddModelError("", "Invalid login attempt.");
+
                         }
+
                     }
+
                     else
+
                     {
+
                         ModelState.AddModelError("", "User is not Approved by Admin");
+
                     }
+
                 }
+
                 else
+
                 {
+
                     ModelState.AddModelError("", "User not found.");
+
                 }
 
                 return View(login);
+
             }
+
             return View(login);
+
         }
+
 
         [HttpGet]
         public async Task<IActionResult> LogOut()

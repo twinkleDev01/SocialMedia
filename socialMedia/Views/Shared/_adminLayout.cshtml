@@ -42,7 +42,7 @@
 					<!--begin::Logo-->
 					<div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
 						<a asp-controller="Admin" asp-action="Index">
-							<h1 class="h-25px app-sidebar-logo-default" style="color:white;">PMS</h1>
+							<h1 class="h-25px app-sidebar-logo-default" style="color:white;">SMCM</h1>
 						</a>
 						<div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary body-bg h-30px w-30px position-absolute top-50 start-100 translate-middle rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
 							<span class="svg-icon svg-icon-2 rotate-180">
@@ -61,50 +61,112 @@
 							<!--begin::Menu-->
 							<div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
 								<div class="menu-item">
-									<!--begin:Menu link-->
-									<a asp-action="index" asp-controller="Admin" class="menu-link px-5 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+									@{
+										var controller = "Home";
+										var action = "Index";
+
+										if (User.IsInRole("Admin"))
+										{
+											controller = "Admin";
+											action = "Index";
+										}
+										else if (User.IsInRole("Employee"))
+										{
+											controller = "Employee";
+											action = "Dashboard";
+										}
+										else if (User.IsInRole("Client"))
+										{
+											controller = "Client";
+											action = "Index";
+										}
+									}
+									<a asp-controller="@controller" asp-action="@action"
+									   class="menu-link px-5 @(ViewContext.RouteData.Values["controller"]?.ToString() == controller && ViewContext.RouteData.Values["action"]?.ToString() == action ? "active" : "")">
 										<span class="svg-icon svg-icon-2">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-												<rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" />
-												<rect opacity="0.3" x="13" y="2" width="9" height="9" rx="2" fill="currentColor" />
-												<rect opacity="0.3" x="13" y="13" width="9" height="9" rx="2" fill="currentColor" />
-												<rect opacity="0.3" x="2" y="13" width="9" height="9" rx="2" fill="currentColor" />
-											</svg>
+											<!-- SVG code here -->
 										</span>
 										<span class="menu-title ms-1">Dashboard</span>
 									</a>
-									<!--end:Menu link-->
 								</div>
-								@if (User.IsInRole("superadmin"))
+								@{
+									if (User.IsInRole("superadmin"))
+									{
+										{
+											<!-- Employees -->
+											<div class="menu-item">
+												<a asp-controller="Admin" asp-action="ListOfAllUsers" class="menu-link px-5">
+													<span class="menu-title">User Management</span>
+												</a>
+											</div>
+
+											<!-- Projects -->
+											<div class="menu-item">
+												<a asp-controller="Project" asp-action="Index" class="menu-link px-5">
+													<span class="menu-title">Project Management</span>
+												</a>
+											</div>
+										}
+										<!-- Clients -->
+										<div class="menu-item">
+											<a asp-controller="Admin" asp-action="TaskList" class="menu-link px-5">
+												<span class="menu-title">Task Management</span>
+											</a>
+										</div>
+
+
+
+										<!-- Reports -->
+										<div class="menu-item">
+											<a asp-controller="Report" asp-action="Index" class="menu-link px-5">
+												<span class="menu-title">Reports</span>
+											</a>
+										</div>
+									}
+									else if (User.IsInRole("Employee"))
+									{
+										<div class="menu-item">
+											<a asp-controller="Employee" asp-action="MyProjects" class="menu-link px-5">
+												<span class="menu-title">My Projects</span>
+											</a>
+										</div>
+										<div class="menu-item">
+											<a asp-controller="Employee" asp-action="MyTasks" class="menu-link px-5">
+												<span class="menu-title">My Tasks</span>
+											</a>
+										</div>
+										<div class="menu-item">
+											<a asp-controller="Report" asp-action="Index" class="menu-link px-5">
+												<span class="menu-title">Reports</span>
+											</a>
+										</div>
+									}
+									else if (User.IsInRole("Client"))
+									{
+										<div class="menu-item">
+											<a asp-controller="Employee" asp-action="MyProjects" class="menu-link px-5">
+												<span class="menu-title">Projects</span>
+											</a>
+										</div>
+										<div class="menu-item">
+											<a asp-controller="Client" asp-action="ContentProgress" class="menu-link px-5">
+												<span class="menu-title">Content Progress</span>
+											</a>
+										</div>
+										
+										<div class="menu-item">
+											<a asp-controller="Employee" asp-action="MyTasks" class="menu-link px-5">
+												<span class="menu-title">Upcoming Deadlines</span>
+											</a>
+										</div>
+										<div class="menu-item">
+											<a asp-controller="Report" asp-action="Index" class="menu-link px-5">
+												<span class="menu-title">Reports</span>
+											</a>
+										</div>
+									}
+								}
 {
-								<!-- Employees -->
-								<div class="menu-item">
-									<a asp-controller="Admin" asp-action="ListOfAllUsers" class="menu-link px-5">
-										<span class="menu-title">User Management</span>
-									</a>
-								</div>
-}
-								<!-- Clients -->
-								<div class="menu-item">
-									<a asp-controller="Admin" asp-action="TaskList" class="menu-link px-5">
-										<span class="menu-title">TASK</span>
-									</a>
-								</div>
-
-								<!-- Projects -->
-								<div class="menu-item">
-									<a asp-controller="Project" asp-action="Index" class="menu-link px-5">
-										<span class="menu-title">Projects</span>
-									</a>
-								</div>
-
-								<!-- Reports -->
-								<div class="menu-item">
-									<a asp-controller="Report" asp-action="Index" class="menu-link px-5">
-										<span class="menu-title">Reports</span>
-									</a>
-								</div>
-
 
 							</div>
 							<!--end::Menu-->
@@ -5287,7 +5349,7 @@
 		@{
 			Html.RenderPartial("_ValidationScriptsPartial");
 		}
-
+	@RenderSection("Scripts", required: false)
 </body>
 <!--end::Body-->
 </html>

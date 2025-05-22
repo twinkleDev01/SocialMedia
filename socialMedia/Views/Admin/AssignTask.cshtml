@@ -62,7 +62,7 @@
                         <option value="">-- Select Employee --</option>
                         @foreach (var e in ViewBag.Employees)
                         {
-                            <option value="@e.Id">@e.UserName</option>
+                            <option value="@e.Id">@e.FirstName @e.LastName</option>
                         }
                     </select>
                     <span asp-validation-for="EmployeeId" class="text-danger"></span>

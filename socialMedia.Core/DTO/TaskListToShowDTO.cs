@@ -16,6 +16,7 @@ namespace socialMedia.Core.DTO
 
         public DateTime Deadline { get; set; }
 
+        public DateTime? CompletionDate { get; set; }
         public string Status { get; set; }
 
         public string CompletionLink { get; set; }

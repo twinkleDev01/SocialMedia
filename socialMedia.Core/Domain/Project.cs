@@ -23,5 +23,9 @@ namespace socialMedia.Core.Domain
         public DateTime? UpdatedAt { get; set; }
 
         public bool IsActive { get; set; }
+       
+        public string? ClientId { get; set; }
+
+        
     }
 }

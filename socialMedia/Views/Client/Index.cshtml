@@ -1,0 +1,120 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div style="padding:50px" class="container">
+<h2>Client Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <h5>Total Content</h5>
+                <p id="totalTasks">0</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-3">
+            <div class="card-body">
+                <h5>Completed</h5>
+                <p id="completedTasks">0</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-3">
+            <div class="card-body">
+                <h5>In Progress</h5>
+                <p id="inProgressTasks">0</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white mb-3">
+            <div class="card-body">
+                <h5>Pending</h5>
+                <p id="pendingTasks">0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Recent Tasks</h4>
+
+
+
+
+<div >
+ 
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+    
+
+    <table id="employeeTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Content Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="recentTasksBody">
+           
+        </tbody>
+    </table>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#employeeTable').DataTable();
+    });
+</script>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/ClientAPI/dashboard',
+                method: 'GET',
+                success: function (data) {
+                    $('#totalTasks').text(data.totalTasks);
+                    $('#completedTasks').text(data.completedTasks);
+                    $('#inProgressTasks').text(data.inProgressTasks);
+                    $('#pendingTasks').text(data.pendingTasks);
+
+                    let rows = '';
+
+                    data.recentTasks.forEach(task => {
+                        rows += `
+                            <tr>
+                                <td>${task.title}</td>
+                                <td>${task.status}</td>
+                                <td>${task.deadline.substring(0, 10)}</td>
+                                <td>${task.contentType}</td>
+                                <td>${task.description}</td>
+                            </tr>`;
+                    });
+
+                    $('#recentTasksBody').html(rows);
+                },
+                error: function () {
+                    $('#recentTasksBody').html('<tr><td colspan="5">Failed to load data.</td></tr>');
+                }
+            });
+        });
+    </script>
+}
+
+

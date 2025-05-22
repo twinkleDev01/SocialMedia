@@ -1,0 +1,66 @@
+﻿
+@* @{ *@
+@*     ViewData["Title"] = "UpcomimgDeadlines"; *@
+@*     Layout = "~/Views/Shared/_adminLayout.cshtml"; *@
+@* } *@
+
+@{
+    ViewData["Title"] = "Upcoming Deadlines";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div style="padding:50px" class="container">
+<h2>Upcoming Deadlines (Next 7 Days)</h2>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+<table id="deadlineTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Content Type</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Completion Link</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+</div>
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const table = $('#deadlineTable').DataTable({
+                ajax: {
+                    url: '/api/ClientAPI/upcoming',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'projectName' },
+                    { data: 'title' },
+                    { data: 'description' },
+                    { data: 'contentType' },
+                    { data: 'deadline' },
+                    { data: 'status' },
+                    {
+                        data: 'completionLink',
+                        render: function (data) {
+                            return data
+                                ? `<a href="${data}" target="_blank">View</a>`
+                                : `<span class="text-muted" style="pointer-events: none; opacity: 0.5;">No Link</span>`;
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+}
+
+

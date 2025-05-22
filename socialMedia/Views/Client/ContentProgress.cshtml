@@ -1,0 +1,136 @@
+﻿@using socialMedia.Shared
+@{
+    ViewData["Title"] = "ContentProgress";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+    var contentTypes = System.Enum.GetValues(typeof(socialMedia.Shared.Enum.Enum.ContentType))
+    .Cast<socialMedia.Shared.Enum.Enum.ContentType>()
+    .Select(ct => new
+    {
+        Id = (int)ct,
+        Name = ct.ToString()
+    });
+}
+<div style="padding:50px" class="container">
+
+<h2>Task Progress</h2>
+
+<!-- Filter Section -->
+<div class="mb-3">
+    <label>Content Type:</label>
+    <select id="contentTypeFilter" class="form-select d-inline w-auto">
+        <option value="">All</option>
+        @foreach (var type in contentTypes)
+        {
+            <option value="@type.Id">@type.Name</option>
+        }
+    </select>
+
+    <label class="ms-3">Status:</label>
+    <select id="statusFilter" class="form-select d-inline w-auto">
+        <option value="">All</option>
+        <option value="Assigned">Assigned</option>
+        <option value="InProgress">In Progress</option>
+        <option value="Completed">Completed</option>
+    </select>
+
+    <button id="filterBtn" class="btn btn-primary ms-3">Filter</button>
+</div>
+
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+
+
+<table id="taskTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Content Type</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Completion Link</th>
+        </tr>
+    </thead>
+    <tbody >
+    </tbody>
+</table>
+</div>
+</div>
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+@* <script> *@
+@*     $(document).ready(function () { *@
+@*         $('#taskTable').DataTable(); *@
+@*     }); *@
+@* </script> *@
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const table = $('#taskTable').DataTable({
+                columns: [
+                    { data: 'projectName' },
+                    { data: 'title' },
+                    { data: 'description' },
+                    { data: 'contentType' },
+                    { data: 'deadline' },
+                    { data: 'status' },
+                           {
+            data: 'completionLink',
+            render: function (data) {
+                if (data) {
+                    return `<a href="${data}" target="_blank">View</a>`;
+                } else {
+                    return `<span class="text-muted" style="pointer-events: none; opacity: 0.5;">No Link</span>`;
+                }
+            }
+        }
+                ]
+            });
+
+            function loadTasks() {
+                const contentType = $('#contentTypeFilter').val();
+                const status = $('#statusFilter').val();
+
+                $.ajax({
+                    url: '/api/ClientAPI/filter',
+                    type: 'GET',
+                    data: {
+                        contentType: contentType,
+                        status: status
+                    },
+                    success: function (data) {
+                        table.clear();
+
+                        if (data.length === 0) {
+                            // Optionally show a no-data row, or leave empty
+                            // DataTables shows "No data available in table" by default
+                        } else {
+                            table.rows.add(data);
+                        }
+
+                        table.draw();
+                    },
+                    error: function () {
+                        alert('Failed to load tasks. Please try again.');
+                    }
+                });
+            }
+
+            // Initial load
+            loadTasks();
+
+            // On filter button click
+            $('#filterBtn').click(function () {
+                loadTasks();
+            });
+        });
+    </script>
+}
+

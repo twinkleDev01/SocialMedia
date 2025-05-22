@@ -1,57 +1,92 @@
-﻿@model List<socialMedia.Core.Domain.Project>
+﻿@model socialMedia.Core.DTO.ProjectListViewModel
+
 @{
     ViewData["Title"] = "Projects List";
     Layout = "~/Views/Shared/_adminLayout.cshtml";
+    var projects = Model.Projects;
+    var clients = Model.Clients;
 }
 
-<div style="padding:50px" class="container">
-    <div class="d-flex justify-content-between">
-            <h2 class="mt-5">ALL PROJECTS</h2>
-            <button class="btn btn-primary btn-sm"><a class="text-light"  asp-controller="Project" asp-action="Create">ADD PROJECT</a></button>
+<div style="padding:50px" class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>All Projects</h2>
+        <a class="btn btn-primary btn-sm" asp-controller="Project" asp-action="Create">Add Project</a>
     </div>
 
-
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
 
-    @{
-        int serial = 1;
-    }
-
-    <table id="employeeTable" class="display" style="width:100%">
+    <table id="ProjectTable" class="display table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>#</th>
                 <th>Project Name</th>
                 <th>Description</th>
-
+                <th>Client</th>
                 <th>Created At</th>
+                <th>Client </th>
                 <th>Is Active</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@serial</td>
-                    <td>@user.Name</td>
-                    <td>@user.Description</td>
+            @{
+                int serial = 1;
+                foreach (var project in projects)
+                {
+                    <tr>
+                        <td>@serial</td>
+                        <td>
+                            <a asp-controller="Project" asp-action="Details" asp-route-id="@project.Id">
+                                @project.Name
+                            </a>
+                        </td>
+                        <td>@project.Description</td>
+                        <td>@project.ClientName</td>
+                        <td>@project.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        <form method="post" asp-controller="Project" asp-action="UpdateClient" class="d-flex align-items-center">
+                            <input type="hidden" name="projectId" value="@project.Id" />
+                        <td>
+                         
 
-                    <td>@user.CreatedAt</td>
-                    <td>@user.IsActive</td>
-                </tr>
-                serial++;
+                                <select name="clientId" class="form-select form-select-sm me-2">
+                                    <option value="">-- Select Client --</option>
+                                    @foreach (var client in clients)
+                                    {
+                                        <option value="@client.Value" selected="@(client.Value == project.ClientId ? "selected" : null)">
+                                            @client.Text
+                                        </option>
+                                    }
+                                </select>
+
+                                
+
+                                
+                           
+                        </td>
+                        <td>
+                            <div class="form-check form-switch me-2">
+                                <input class="form-check-input" type="checkbox" name="isActive" value="true" @(project.IsActive ? "checked" : "") />
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-sm btn-success">Save</button>
+                        </td>
+                        </form>
+                        
+                        
+                    </tr>
+                    serial++;
+                }
             }
         </tbody>
     </table>
 </div>
 
-<!-- jQuery + DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
 <script>
     $(document).ready(function () {
-        $('#employeeTable').DataTable();
+        $('#ProjectTable').DataTable();
     });
 </script>

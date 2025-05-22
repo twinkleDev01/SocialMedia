@@ -1,14 +1,13 @@
-﻿@model List<socialMedia.Core.DTO.TaskListToShowDTO>;
+﻿@model List<socialMedia.Core.Domain.Project>
 @{
-    ViewData["Title"] = "TaskList";
+    ViewData["Title"] = "MyProjects";
     Layout = "~/Views/Shared/_adminLayout.cshtml";
 }
 
-
 <div style="padding:50px" class="container">
     <div class="d-flex justify-content-between">
-        <h2 class="mt-5">ALL TASK</h2>
-        <button class="btn btn-primary btn-sm"><a class="text-light" asp-controller="Admin" asp-action="AssignTask">ADD TASK</a></button>
+        <h2 class="mt-5">MY PROJECTS</h2>
+        <button class="btn btn-primary btn-sm"><a class="text-light" asp-controller="Project" asp-action="Create">ADD PROJECT</a></button>
     </div>
 
 
@@ -19,19 +18,15 @@
         int serial = 1;
     }
 
-    <table id="employeeTable" class="display" style="width:100%">
+    <table id="ProjectTable" class="display" style="width:100%">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Project Name</th>
-                <th>Title</th>
-
                 <th>Description</th>
-                <th>Content Type</th>
-                <th>Assigned To</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>CompletionLink</th>
+
+                <th>Created At</th>
+                <th>Is Active</th>
             </tr>
         </thead>
         <tbody>
@@ -39,15 +34,16 @@
             {
                 <tr>
                     <td>@serial</td>
-                    <td>@user.ProjectName</td>
-                    <td>@user.Title</td>
+                    <td>
+                        <a asp-controller="Project" asp-action="Details" asp-route-id="@user.Id">
+                            @user.Name
+                        </a>
+                    </td>
 
                     <td>@user.Description</td>
-                    <td>@user.ContentType</td>
-                    <td>@user.EmployeeName</td>
-                    <td>@user.Deadline</td>
-                     <td>@user.Status</td>
-                    <td>@user.CompletionLink</td>
+
+                    <td>@user.CreatedAt</td>
+                    <td>@user.IsActive</td>
                 </tr>
                 serial++;
             }
@@ -61,8 +57,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#employeeTable').DataTable();
+        $('#ProjectTable').DataTable();
     });
 </script>
-
 

@@ -9,7 +9,8 @@ using System.Security.Claims;
 
 namespace socialMedia.Controllers
 {
-    [Authorize]
+   
+   
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,10 +25,10 @@ namespace socialMedia.Controllers
         public IActionResult Index()
         {
 
-            foreach(var claim in User.Claims)
-            {
-                Console.WriteLine($"{claim.Type} : {claim.Value}");
-            }
+            //foreach(var claim in User.Claims)
+            //{
+            //    Console.WriteLine($"{claim.Type} : {claim.Value}");
+            //}
             
 
             return View();
@@ -92,7 +93,9 @@ namespace socialMedia.Controllers
                              CompletionLink = task.CompletionLink,
                              ContentType = task.ContentType,
                              ProjectName = project.Name,
-                             EmployeeName = employee.UserName
+                            CompletionDate = task.CompletionDate,
+                             EmployeeName = $"{employee.FirstName} {employee.LastName}"
+                           
                          }).ToList();
 
             return View(tasks);

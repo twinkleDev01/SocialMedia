@@ -1,36 +1,109 @@
-﻿@model List<socialMedia.Core.Domain.ProjectTask>;
+﻿@model List<socialMedia.Core.DTO.EmployeeTaskDetail>;
 @{
     ViewData["Title"] = "MyTasks";
     Layout = "~/Views/Shared/_adminLayout.cshtml";
 }
 
 
-<table>
-    <tr>
-        <th>Title</th>
-        <th>Deadline</th>
-        <th>Status</th>
-        <th>Update</th>
-    </tr>
-    @foreach (var task in Model)
+
+<div style="padding:50px" class="container">
+    <div class="d-flex justify-content-between">
+        <h2 class="mt-5">ALL TASK</h2>
+        </div>
+
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+
+    @{
+        int serial = 1;
+    }
+
+    <table id="employeeTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Project Name</th>
+                <th>Title</th>
+
+                <th>Description</th>
+                <th>Content Type</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>CompletionLink</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+       <tbody>
+    @foreach (var user in Model)
     {
         <tr>
-            <td>@task.Title</td>
-            <td>@task.Deadline.ToShortDateString()</td>
-            <td>@task.Status</td>
-            <td>
-                <form asp-action="UpdateStatus" method="post">
-                    <input type="hidden" name="id" value="@task.Id" />
-                    <select name="status">
-                        <option value="InProgress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                    <input name="link" placeholder="Completion Link" />
-                    <button type="submit">Update</button>
-                </form>
-            </td>
+            <form asp-action="UpdateTaskStatus" asp-controller="Employee" method="post">
+                <td>@serial</td>
+                <td>@user.ProjectName</td>
+                <td>@user.Title</td>
+                <td>@user.Description</td>
+                <td>@user.ContentType</td>
+                <td>@user.Deadline.ToString("yyyy-MM-dd")</td>
+
+                <td>
+                        <select name="Status" class="form-select form-select-sm">
+                                @if (user.Status == "Assigned")
+                                {
+                                <option value="Assigned" selected>Assigned</option>
+                                }
+                                else
+                                {
+                                <option value="Assigned">Assigned</option>
+                                }
+
+                                @if (user.Status == "InProgress")
+                                {
+                                <option value="InProgress" selected>InProgress</option>
+                                }
+                                else
+                                {
+                                <option value="InProgress">InProgress</option>
+                                }
+
+                                @if (user.Status == "Completed")
+                                {
+                                <option value="Completed" selected>Completed</option>
+                                }
+                                else
+                                {
+                                <option value="Completed">Completed</option>
+                                }
+                        </select>
+
+                </td>
+
+                <td>
+                        <input type="text" name="CompletionLink" class="form-control form-control-sm" value="@user.CompletionLink" placeholder="Optional: Paste link" />
+                        <input type="hidden" name="TaskId" value="@user.TaskId"  />
+                </td>
+
+                <td>
+                    <button type="submit" class="btn btn-sm btn-success">Update</button>
+                </td>
+            </form>
         </tr>
+        serial++;
     }
-</table>
+</tbody>
+
+    </table>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#employeeTable').DataTable();
+    });
+</script>
+
 
 

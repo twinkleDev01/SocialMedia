@@ -1,0 +1,125 @@
+﻿
+
+
+@using socialMedia.Shared.Enum
+@{
+    ViewData["Title"] = "Task Report";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+
+    var years = Enumerable.Range(DateTime.Now.Year - 5, 6); // Last 5 years + current
+    var months = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames
+        .Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
+}
+<h2>Task Completion Report</h2>
+
+<div class="row mb-4">
+    <div class="col">
+        <label>Year:</label>
+        <select id="yearFilter" class="form-select">
+            <option value="">All</option>
+            @foreach (var y in years)
+            {
+                <option value="@y">@y</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <label>Month:</label>
+        <select id="monthFilter" class="form-select">
+            <option value="">All</option>
+            @for (int i = 0; i < months.Count; i++)
+            {
+                <option value="@(i + 1)">@months[i]</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <label>Project:</label>
+        <select id="projectFilter" class="form-select">
+            <option value="">All</option>
+        </select>
+    </div>
+    <div class="col">
+        <label>Content Type:</label>
+        <select id="contentTypeFilter" class="form-select">
+            <option value="">All</option>
+            @foreach (socialMedia.Shared.Enum.Enum.ContentType type in System.Enum.GetValues(typeof(socialMedia.Shared.Enum.Enum.ContentType)))
+            {
+                <option value="@((int)type)">@type</option>
+            }
+
+        </select>
+    </div>
+    <div class="col d-flex align-items-end">
+        <button id="filterBtn" class="btn btn-primary w-100">Filter</button>
+    </div>
+</div>
+
+<table class="table table-bordered" id="reportTable">
+    <thead>
+        <tr>
+            <th>Content Type</th>
+            <th>Completed Tasks</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            loadProjects();
+            loadReport();
+
+            $('#filterBtn').click(function () {
+                loadReport();
+            });
+
+            function loadProjects() {
+                $.get('/api/ClientAPI/projects', function (data) {
+                    data.forEach(project => {
+                        $('#projectFilter').append(`<option value="${project.id}">${project.name}</option>`);
+                    });
+                });
+            }
+
+            function loadReport() {
+                const year = $('#yearFilter').val();
+                const month = $('#monthFilter').val();
+                const projectId = $('#projectFilter').val();
+                const contentType = $('#contentTypeFilter').val();
+
+                $.ajax({
+                    url: '/api/ClientAPI/report',
+                    type: 'GET',
+                    data: {
+                        year,
+                        month,
+                        projectId,
+                        contentType
+                    },
+                    success: function (data) {
+                        let rows = '';
+                        if (data.length === 0) {
+                            rows = '<tr><td colspan="2" class="text-center">No data found</td></tr>';
+                        } else {
+                            data.forEach(item => {
+                                rows += `<tr>
+                                            <td>${item.contentType}</td>
+                                            <td>${item.count}</td>
+                                        </tr>`;
+                            });
+                        }
+                        $('#reportTable tbody').html(rows);
+                    },
+                    error: function () {
+                        alert('Error loading report data.');
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+

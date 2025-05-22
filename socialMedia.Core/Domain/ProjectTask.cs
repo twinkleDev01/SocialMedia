@@ -37,6 +37,8 @@ namespace socialMedia.Core.Domain
 
         public DateTime? UpdatedAt { get; set; }
 
+        public DateTime? CompletionDate { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }
