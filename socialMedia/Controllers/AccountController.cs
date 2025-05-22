@@ -97,7 +97,7 @@ namespace social.Controllers
                             }
                             else if (roles.Contains("Employee"))
                             {
-                                return RedirectToAction("Dashboard", "Employee");
+                                return RedirectToAction("MyProjects", "Employee");
                             }
                             else if (roles.Contains("Client"))
                             {
