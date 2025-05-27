@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using static socialMedia.Shared.Enum.Enum;
 
 namespace socialMedia.Controllers
 {
+    [Authorize(Roles = "superadmin")]
     public class ProjectController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -28,6 +30,7 @@ namespace socialMedia.Controllers
                                   join user in _context.Users
                                   on project.ClientId equals user.Id into clientGroup
                                   from client in clientGroup.DefaultIfEmpty()
+                                  orderby project.CreatedAt descending // 🔥 Sort: newest first
                                   select new ProjectViewModelDTO
                                   {
                                       Id = project.Id,

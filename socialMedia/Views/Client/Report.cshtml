@@ -1,7 +1,4 @@
-﻿
-
-
-@using socialMedia.Shared.Enum
+﻿@using socialMedia.Shared.Enum
 @{
     ViewData["Title"] = "Task Report";
     Layout = "~/Views/Shared/_adminLayout.cshtml";
@@ -10,6 +7,8 @@
     var months = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames
         .Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
 }
+
+<div class="container" style="padding:50px">
 <h2>Task Completion Report</h2>
 
 <div class="row mb-4">
@@ -47,7 +46,6 @@
             {
                 <option value="@((int)type)">@type</option>
             }
-
         </select>
     </div>
     <div class="col d-flex align-items-end">
@@ -64,10 +62,15 @@
     </thead>
     <tbody></tbody>
 </table>
-
+</div>
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+
     <script>
+        let reportTable;
+
         $(document).ready(function () {
             loadProjects();
             loadReport();
@@ -108,10 +111,24 @@
                                 rows += `<tr>
                                             <td>${item.contentType}</td>
                                             <td>${item.count}</td>
-                                        </tr>`;
+                                         </tr>`;
                             });
                         }
+
+                        // Populate table
                         $('#reportTable tbody').html(rows);
+
+                        // Reinitialize or reload DataTable
+                        if ($.fn.DataTable.isDataTable('#reportTable')) {
+                            reportTable.clear().destroy(); // destroy previous instance
+                        }
+
+                        reportTable = $('#reportTable').DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            responsive: true
+                        });
                     },
                     error: function () {
                         alert('Error loading report data.');
@@ -121,5 +138,3 @@
         });
     </script>
 }
-
-

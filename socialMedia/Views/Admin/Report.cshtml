@@ -1,0 +1,146 @@
+﻿
+@{
+    ViewData["Title"] = "Report";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div class="container" style="padding:50px">
+<h2>Task Report</h2>
+
+<div class="row mb-3">
+    <div class="col-md-2">
+        <select id="yearFilter" class="form-control">
+            <option value="">All Years</option>
+            @{
+                var currentYear = DateTime.Now.Year;
+                for (int y = currentYear; y >= currentYear - 5; y--)
+                {
+                    <option value="@y">@y</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="monthFilter" class="form-control">
+            <option value="">All Months</option>
+            @{
+                for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="projectFilter" class="form-control">
+            <option value="">All Projects</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="clientFilter" class="form-control">
+            <option value="">All Clients</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="employeeFilter" class="form-control">
+            <option value="">All Employees</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="contentTypeFilter" class="form-control">
+            <option value="">All Types</option>
+            <option value="1">Post</option>
+            <option value="2">Video</option>
+            <option value="3">Story</option>
+            <option value="4">Reel</option>
+            <option value="5">Other</option>
+        </select>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <select id="statusFilter" class="form-control">
+            <option value="">All Statuses</option>
+            <option value="Assigned">Assigned</option>
+            <option value="InProgress">InProgress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button id="filterBtn" class="btn btn-primary">Apply Filter</button>
+    </div>
+</div>
+
+<table id="reportTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Content Type</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+</div>
+@section Scripts {
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            loadClients();
+            loadProjects();
+            loadEmployees();
+
+            var table = $('#reportTable').DataTable({
+                ajax: {
+                    url: '/report',
+                    data: function (d) {
+                        d.year = $('#yearFilter').val();
+                        d.month = $('#monthFilter').val();
+                        d.projectId = $('#projectFilter').val();
+                        d.clientId = $('#clientFilter').val();
+                        d.employeeId = $('#employeeFilter').val();
+                        d.contentType = $('#contentTypeFilter').val();
+                        d.status = $('#statusFilter').val();
+                    },
+                    dataSrc: ''
+                },
+                       columns: [
+            { data: 'contentType' }, // corrected
+            { data: 'count' }        // corrected
+        ]
+            });
+
+            $('#filterBtn').click(function () {
+                table.ajax.reload();
+            });
+
+            function loadClients() {
+                $.get('/api/clients', function (data) {
+                    $.each(data, function (i, client) {
+                        $('#clientFilter').append(`<option value="${client.id}">${client.name}</option>`);
+                    });
+                });
+            }
+
+            function loadProjects() {
+                $.get('/api/projects', function (data) {
+                    $.each(data, function (i, proj) {
+                        $('#projectFilter').append(`<option value="${proj.id}">${proj.name}</option>`);
+                    });
+                });
+            }
+
+            function loadEmployees() {
+                $.get('/api/employees', function (data) {
+                    $.each(data, function (i, emp) {
+                        $('#employeeFilter').append(`<option value="${emp.id}">${emp.name}</option>`);
+                    });
+                });
+            }
+        });
+    </script>
+}
+
+

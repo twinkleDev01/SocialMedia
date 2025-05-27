@@ -14,5 +14,10 @@ namespace socialMedia.Core.Domain
 
         public bool IsActive { get; set; } = false;
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
     }
 }

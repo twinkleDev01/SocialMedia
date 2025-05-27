@@ -26,6 +26,6 @@ namespace socialMedia.Core.Domain
        
         public string? ClientId { get; set; }
 
-        
+        public bool IsDeleted { get; set; }
     }
 }

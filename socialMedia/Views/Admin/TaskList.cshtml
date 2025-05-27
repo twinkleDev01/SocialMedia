@@ -47,7 +47,10 @@
                     <td>@user.EmployeeName</td>
                     <td>@user.Deadline</td>
                      <td>@user.Status</td>
-                    <td>@user.CompletionLink</td>
+                    <td>
+                        <a href="@user.CompletionLink" target="_blank">@user.CompletionLink</a>
+                    </td>
+
                 </tr>
                 serial++;
             }

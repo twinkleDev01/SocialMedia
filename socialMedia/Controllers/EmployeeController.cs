@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using socialMedia.Core.Domain;
@@ -9,6 +10,7 @@ using static socialMedia.Shared.Enum.Enum;
 
 namespace socialMedia.Controllers
 {
+    [Authorize(Roles = "Employee")]
     public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -70,7 +72,19 @@ namespace socialMedia.Controllers
                 return NotFound();
 
             if (!string.IsNullOrWhiteSpace(Status))
+            {
                 task.Status = Status;
+
+                // Set CompletionDate if status is "Completed"
+                if (Status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+                {
+                    task.CompletionDate = DateTime.UtcNow; // Or DateTime.Now if you prefer local time
+                }
+                else
+                {
+                    task.CompletionDate = null;
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(CompletionLink))
                 task.CompletionLink = CompletionLink;
@@ -79,6 +93,7 @@ namespace socialMedia.Controllers
 
             return RedirectToAction("MyTasks");
         }
+
 
         public async Task<IActionResult> MyProjects()
         {

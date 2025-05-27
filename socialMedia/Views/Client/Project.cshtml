@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Project";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<div class="container" style="padding:50px">
+<h2 class="text-primary">Projects</h2>
+
+<table id="projectTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Description</th>
+            <th>Created Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Filled by JS -->
+    </tbody>
+</table>
+</div>
+
+@section Scripts {
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            console.log("Calling assigned-projects API...");
+
+            $.ajax({
+                url: '/api/ClientAPI/assigned-projects',
+                type: 'GET',
+                success: function (data) {
+                    let rows = '';
+
+                    if (data.length === 0) {
+                        rows = `<tr><td colspan="3" class="text-center">No assigned projects found.</td></tr>`;
+                    } else {
+                        data.forEach(project => {
+                            rows += `
+                                <tr>
+                                    <td>${project.name}</td>
+                                    <td>${project.description}</td>
+                                    <td>${new Date(project.createdAt).toLocaleDateString()}</td>
+                                </tr>`;
+                        });
+                    }
+
+                    $('#projectTable tbody').html(rows);
+
+                    // Initialize DataTable
+                    if ($.fn.DataTable.isDataTable('#projectTable')) {
+                        $('#projectTable').DataTable().clear().destroy();
+                    }
+
+                    $('#projectTable').DataTable({
+                        pageLength: 5,
+                        lengthChange: true,
+                        searching: true
+                    });
+                },
+                error: function () {
+                    alert('Failed to load assigned projects.');
+                }
+            });
+        });
+    </script>
+}

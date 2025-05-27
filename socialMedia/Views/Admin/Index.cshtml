@@ -101,7 +101,7 @@
                     <i class="fas fa-route fa-2x"></i>
                     <div class="my-4">
                         <div class="fs-5 fw-semibold">TOTAL PROJECTS</div>
-                        <div class="fs-6">Total: <span class="fw-bold">1</span></div>
+                        <div class="fs-6" id="totalProjects"></div>
                     </div>
                 </div>
             </div>
@@ -113,8 +113,8 @@
                 <div class="card-body d-flex flex-column align-items-start text-white">
                     <i class="fas fa-calendar-day fa-2x"></i>
                     <div class="my-4">
-                        <div class="fs-5 fw-semibold">TOTAL EMPLOYEE</div>
-                        <div class="fs-6">Pending: <span class="fw-bold">1</span></div>
+                        <div class="fs-5 fw-semibold">TOTAL CLIENTS</div>
+                        <div class="fs-6" id="totalClients"></div>
                     </div>
                 </div>
             </div>
@@ -126,8 +126,8 @@
                 <div class="card-body d-flex flex-column align-items-start text-white">
                     <i class="fas fa-calendar-week fa-2x"></i>
                     <div class="my-4">
-                        <div class="fs-5 fw-semibold">PENDING APPROVAL REQUEST</div>
-                        <div class="fs-6">Pending request: <span class="fw-bold inspectionCount"></span></div>
+                        <div class="fs-5 fw-semibold">TOTAL EMPLOYEE</div>
+                        <div class="fs-6" id="totalEmployeesPending"></div>
                     </div>
                 </div>
             </div>
@@ -139,8 +139,8 @@
                 <div class="card-body d-flex flex-column align-items-start text-white">
                     <i class="fas fa-calendar-alt fa-2x"></i>
                     <div class="my-4">
-                        <div class="fs-5 fw-semibold">DEADLINE REMINDER</div>
-                        <div class="fs-6">Pending: <span class="fw-bold">1</span></div>
+                        <div class="fs-5 fw-semibold">PENDING APPROVAL REQUEST</div>
+                        <div id="pendingApprovalRequests" class="fs-6"></div>
                     </div>
                 </div>
             </div>
@@ -152,8 +152,9 @@
                 <div class="card-body d-flex flex-column align-items-start text-white">
                     <i class="fas fa-users fa-2x"></i>
                     <div class="my-4">
-                        <div class="fs-5 fw-semibold">CLIENTS</div>
-                        <div class="fs-6">Total: <span class="fw-bold">1</span></div>
+                        <div class="fs-5 fw-semibold">
+                             DEADLINE REMINDER<div>
+                        <div class="fs-6" id="deadlineReminders"></div>
                     </div>
                 </div>
             </div>
@@ -172,5 +173,15 @@
 <script>
         $(document).ready(function () {
         $('#loaderOverlay').fadeOut();
+    });
+        $(document).ready(function () {
+        $.get('/summary', function (data) {
+            console.log(data);
+            $('#totalProjects').text(`Total: ${data.totalProjects}`);
+            $('#totalClients').text(`Total: ${data.totalClients}`);
+            $('#totalEmployeesPending').text(`Total: ${data.totalEmployeesPending}`);
+            $('#pendingApprovalRequests').text(`Pending request: ${data.pendingApprovalRequests}`);
+            $('#deadlineReminders').text(`Pending: ${data.deadlineReminders}`);
+        });
     });
 </script>

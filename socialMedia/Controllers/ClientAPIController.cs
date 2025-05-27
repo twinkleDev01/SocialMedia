@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,11 @@ using System.Security.Claims;
 using static socialMedia.Shared.Enum.Enum;
 namespace socialMedia.Controllers
 {
+    [Authorize(Roles = "Client,superadmin")]
     [Route("api/[controller]")]
     [ApiController]
+   
+
     public class ClientAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -115,7 +119,12 @@ namespace socialMedia.Controllers
                                 ProjectName = project.Name,
                                 task.Title,
                                 task.Description,
-                                ContentType = task.ContentType,
+                                ContentType = Convert.ToInt16(task.ContentType) == (int)ContentType.Post ? "Post" :
+                                           Convert.ToInt16(task.ContentType) == (int)ContentType.Video ? "Video" :
+                                           Convert.ToInt16(task.ContentType) == (int)ContentType.Story ? "Story" :
+                                           Convert.ToInt16(task.ContentType) == (int)ContentType.Reel ? "Reel" :
+                                           Convert.ToInt16(task.ContentType) == (int)ContentType.Others ? "Other" :
+                                           "NOT SPECIFIED",
                                 Deadline = task.Deadline.ToString("yyyy-MM-dd"),
                                 task.Status,
                                 task.CompletionLink
@@ -125,38 +134,84 @@ namespace socialMedia.Controllers
         }
 
         [HttpGet("report")]
-        public IActionResult GetTaskReport(
-    int? year, int? month, int? projectId, string contentType = null, string status = null)
+        public IActionResult GetTaskReport(int? year, int? month, int? projectId, string contentType = null, string status = null)
         {
-            var query = _context.ProjectTasks
-                .Where(t => !t.IsDeleted);
+            // Get the logged-in client ID from claims
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(clientId))
+                return Unauthorized();
 
+            // Join ProjectTasks with Projects manually
+            var query = from task in _context.ProjectTasks
+                        join project in _context.Projects
+                        on task.ProjectId equals project.Id
+                        where !task.IsDeleted && project.ClientId == clientId
+                        select task;
+
+            // Apply filters
             if (!string.IsNullOrEmpty(status))
                 query = query.Where(t => t.Status == status);
 
             if (year.HasValue)
-                query = query.Where(t => t.CompletionDate.HasValue && t.CompletionDate.Value.Year == year);
+                query = query.Where(t => t.CompletionDate.HasValue && t.CompletionDate.Value.Year == year.Value);
 
             if (month.HasValue)
-                query = query.Where(t => t.CompletionDate.HasValue && t.CompletionDate.Value.Month == month);
+                query = query.Where(t => t.CompletionDate.HasValue && t.CompletionDate.Value.Month == month.Value);
 
             if (projectId.HasValue)
-                query = query.Where(t => t.ProjectId == projectId);
+                query = query.Where(t => t.ProjectId == projectId.Value);
 
             if (!string.IsNullOrEmpty(contentType))
                 query = query.Where(t => t.ContentType == contentType);
 
+            // Group and convert ContentType
             var grouped = query
-                .GroupBy(t => new { t.ContentType })
+                .GroupBy(t => t.ContentType)
                 .Select(g => new
                 {
-                    ContentType = g.Key.ContentType,
+                    ContentTypeValue = g.Key,
                     Count = g.Count()
-                }).ToList();
+                })
+                .ToList()
+                .Select(g => new
+                {
+                    ContentType = GetContentTypeName(Convert.ToInt32(g.ContentTypeValue)),
+                    Count = g.Count
+                })
+                .ToList();
 
             return Ok(grouped);
         }
 
+        private static string GetContentTypeName(int contentType)
+        {
+            return contentType == (int)ContentType.Post ? "Post" :
+                   contentType == (int)ContentType.Video ? "Video" :
+                   contentType == (int)ContentType.Story ? "Story" :
+                   contentType == (int)ContentType.Reel ? "Reel" :
+                   contentType == (int)ContentType.Others ? "Other" :
+                   "NOT SPECIFIED";
+        }
+
+
+
+        [HttpGet("assigned-projects")]
+        public async Task<IActionResult> GetAssignedProjects()
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier); // get logged-in client user ID
+
+            var projects = await _context.Projects
+                .Where(p => p.ClientId == clientId && p.IsActive)
+                .Select(p => new {
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    CreatedAt = p.CreatedAt.ToString("yyyy-MM-dd")
+                })
+                .ToListAsync();
+
+            return Ok(projects);
+        }
 
 
 

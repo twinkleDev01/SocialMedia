@@ -24,19 +24,13 @@ namespace socialMedia.Controllers
 
         public IActionResult Index()
         {
-
-            //foreach(var claim in User.Claims)
-            //{
-            //    Console.WriteLine($"{claim.Type} : {claim.Value}");
-            //}
-            
-
             return View();
         }
         public async Task<IActionResult> ListOfAllUsers()
         {
-
             var users = await _context.Users
+                .OrderByDescending(user => user.CreatedAt)
+                         // Sort by latest first 
                          .Select(user => new AllUserDetailDTO
                          {
                              Id = user.Id,
@@ -52,6 +46,7 @@ namespace socialMedia.Controllers
 
             return View(users);
         }
+
 
         public IActionResult AssignTask()
         {
@@ -83,6 +78,7 @@ namespace socialMedia.Controllers
             var tasks = (from task in _context.ProjectTasks
                          join project in _context.Projects on task.ProjectId equals project.Id
                          join employee in _context.Users on task.EmployeeId equals employee.Id
+                         orderby task.CreatedAt descending 
                          select new TaskListToShowDTO
                          {
                              Id = task.Id,
@@ -91,15 +87,22 @@ namespace socialMedia.Controllers
                              Deadline = task.Deadline,
                              Status = task.Status,
                              CompletionLink = task.CompletionLink,
-                             ContentType = Convert.ToInt32(task.ContentType) == (int)ContentType.Post ? "Post" : Convert.ToInt32(task.ContentType) == (int)ContentType.Video ? "Video" : Convert.ToInt32(task.ContentType) == (int)ContentType.Story ? "Story" : Convert.ToInt32(task.ContentType) == (int)ContentType.Reel ? "Reel" : Convert.ToInt32(task.ContentType) == (int)ContentType.Others ? "Other" : "NOT SPECIFIED",
+                             ContentType = Convert.ToInt32(task.ContentType) == (int)ContentType.Post ? "Post" :
+                                           Convert.ToInt32(task.ContentType) == (int)ContentType.Video ? "Video" :
+                                           Convert.ToInt32(task.ContentType) == (int)ContentType.Story ? "Story" :
+                                           Convert.ToInt32(task.ContentType) == (int)ContentType.Reel ? "Reel" :
+                                           Convert.ToInt32(task.ContentType) == (int)ContentType.Others ? "Other" : "NOT SPECIFIED",
                              ProjectName = project.Name,
-                            CompletionDate = task.CompletionDate,
+                             CompletionDate = task.CompletionDate,
                              EmployeeName = $"{employee.FirstName} {employee.LastName}"
-                           
                          }).ToList();
 
             return View(tasks);
         }
 
+        public IActionResult Report()
+        {
+            return View();
+        }
     }
 }

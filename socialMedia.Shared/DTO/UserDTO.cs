@@ -10,7 +10,7 @@ namespace socialMedia.Shared.DTO
     public class UserDTO
     {
         [Required]
-        [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Only contain letters and digits.")]
+        [RegularExpression("^[a-zA-Z0-9 ]*$", ErrorMessage = "Only letters, digits, and spaces are allowed.")]
         public string FirstName { get; set; }
         public string LastName { get; set; }
 

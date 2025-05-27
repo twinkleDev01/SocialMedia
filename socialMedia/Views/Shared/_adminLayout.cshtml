@@ -65,7 +65,7 @@
 										var controller = "Home";
 										var action = "Index";
 
-										if (User.IsInRole("Admin"))
+										if (User.IsInRole("superadmin"))
 										{
 											controller = "Admin";
 											action = "Index";
@@ -118,7 +118,7 @@
 
 										<!-- Reports -->
 										<div class="menu-item">
-											<a asp-controller="Report" asp-action="Index" class="menu-link px-5">
+											<a asp-controller="Admin" asp-action="Report" class="menu-link px-5">
 												<span class="menu-title">Reports</span>
 											</a>
 										</div>
@@ -144,7 +144,7 @@
 									else if (User.IsInRole("Client"))
 									{
 										<div class="menu-item">
-											<a asp-controller="Client" asp-action="ContentProgress" class="menu-link px-5">
+											<a asp-controller="Client" asp-action="Project" class="menu-link px-5">
 												<span class="menu-title">Projects</span>
 											</a>
 										</div>
